@@ -31,6 +31,6 @@ jobs:
           go build -o ./app
 
       # Restart the application
-      - name: Restart application
-        run: |
-          ssh ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} 'sudo systemctl restart your-service-name'
+      - name: SSH connection debug
+        run: ssh -vvv ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}
+
