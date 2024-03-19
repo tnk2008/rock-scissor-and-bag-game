@@ -20,6 +20,10 @@ jobs:
           go mod tidy
           go build -o ./app
 
+      - name: Update known hosts
+        run: ssh-keyscan -H 54.152.92.98 >> ~/.ssh/known_hosts
+        
+
       # Restart the application
       - name: Restart application
         run: |
