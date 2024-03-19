@@ -13,16 +13,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Create known_hosts file if not exists
+      - name: Create known_hosts file
+        run: touch ~/.ssh/known_hosts
+
+      # Update known hosts with ssh-keyscan
+      - name: Update known hosts
+        run: ssh-keyscan -H <EC2 instance IP> >> ~/.ssh/known_hosts
+
       # Install Go dependencies and build the application
       - name: Install Go dependencies and build
         run: |
           cd $GITHUB_WORKSPACE
           go mod tidy
           go build -o ./app
-
-      - name: Update known hosts
-        run: ssh-keyscan -H 54.152.92.98 >> ~/.ssh/known_hosts
-        
 
       # Restart the application
       - name: Restart application
