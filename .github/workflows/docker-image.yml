@@ -1,4 +1,4 @@
-name: subworkflow
+name: cd-pipeline
 
 on:
   push:
@@ -13,9 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Create known_hosts file if not exists
-      - name: Create known_hosts file
-        run: touch ~/.ssh/known_hosts
+      # Create .ssh directory and known_hosts file if not exists
+      - name: Create .ssh directory and known_hosts file
+        run: |
+          mkdir -p ~/.ssh
+          touch ~/.ssh/known_hosts
 
       # Update known hosts with ssh-keyscan
       - name: Update known hosts
@@ -31,4 +33,4 @@ jobs:
       # Restart the application
       - name: Restart application
         run: |
-          ssh ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}
+          ssh ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} 'sudo systemctl restart your-service-name'
