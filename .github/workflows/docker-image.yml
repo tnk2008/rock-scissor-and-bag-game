@@ -16,7 +16,7 @@ jobs:
       # Install Go dependencies and build the application
       - name: Install Go dependencies and build
         run: |
-          cd /home/root
+          cd /home/ec2-user/goland
           go mod tidy
           go build -o ./app
 
