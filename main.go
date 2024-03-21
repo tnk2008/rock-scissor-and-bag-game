@@ -1,17 +1,17 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	_ "github.com/microsoft/go-mssqldb"
 	"log"
 	"math/rand"
 	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"
 )
-import "github.com/gin-contrib/cors"
 
 // GameResult represents the result of a game round
 type GameResult struct {
@@ -22,6 +22,11 @@ type GameResult struct {
 
 // Database connection
 var db *sql.DB
+var server = "tna.database.windows.net"
+var port = 1433
+var user = "tna"
+var password = "Collins123"
+var database = "gamedb"
 
 func main() {
 
@@ -109,20 +114,22 @@ func getGameStatistics(c *gin.Context) {
 }
 
 // initDB initializes the database connection
+// initDB initializes the database connection
 func initDB() {
+	connString := fmt.Sprintf("server=%s;user id=%s;password=%s;port=%d;database=%s;",
+		server, user, password, port, database)
 	var err error
-	db, err = sql.Open("mysql", "root:root@tcp(localhost:3306)/game_db")
+	// Create connection pool
+	db, err = sql.Open("sqlserver", connString)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Error creating connection pool: ", err.Error())
 	}
-
-	// Ping database to verify connection
-	err = db.Ping()
+	ctx := context.Background()
+	err = db.PingContext(ctx)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err.Error())
 	}
-
-	fmt.Println("Connected to database")
+	fmt.Printf("Connected!")
 }
 
 // getComputerChoice generates a random choice for the computer
@@ -144,10 +151,18 @@ func determineWinner(playerChoice, computerChoice string) string {
 		return "computer"
 	}
 }
-
+var ctx = context.Background()
 // storeGameRound stores the game round in the database
 func storeGameRound(playerChoice, computerChoice, winner string) {
-	_, err := db.Exec("INSERT INTO game_rounds (player_choice, computer_choice, winner) VALUES (?, ?, ?)", playerChoice, computerChoice, winner)
+	query := `
+        INSERT INTO game_rounds (player_choice, computer_choice, winner, created_at)
+        VALUES (@playerChoice, @computerChoice, @winner, GETDATE())
+    `
+	_, err := db.ExecContext(ctx, query,
+		sql.Named("playerChoice", playerChoice),
+		sql.Named("computerChoice", computerChoice),
+		sql.Named("winner", winner),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
