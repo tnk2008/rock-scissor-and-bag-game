@@ -55,7 +55,7 @@
 
           var choice = document.getElementById("choice").value;
 
-          fetch("http://localhost:8080/play", {
+          fetch("https://54.152.92.98:8080/play", {
             method: "POST",
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
@@ -79,7 +79,7 @@
         });
 
       function fetchGameHistory() {
-        fetch("http://localhost:8080/allGames")
+        fetch("https://54.152.92.98:8080/allGames")
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
@@ -106,7 +106,7 @@
           });
       }
       function fetchGameStats() {
-        fetch("http://localhost:8080/stats")
+        fetch("https://54.152.92.98:8080/stats")
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
